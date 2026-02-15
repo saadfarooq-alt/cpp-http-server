@@ -4,7 +4,6 @@
 #include <thread>
 #include <vector>
 #include <atomic>
-#include <variant>
 #include <netinet/in.h>
 #include <unistd.h>
 
@@ -12,7 +11,6 @@ constexpr int PORT = 8080;
 std::atomic<bool> running{true};
 
 void handleClient(int clientSocket) {
-    // SFML 3: Use sf::Vector2u directly in constructor
     sf::RenderWindow window(sf::VideoMode({400u, 200u}), "New Client Window");
     
     sf::Font font;
@@ -26,10 +24,9 @@ void handleClient(int clientSocket) {
     text.setPosition({20.f, 80.f});
     
     while (window.isOpen() && running) {
-        // SFML 3: pollEvent() returns std::optional<sf::Event>
         while (auto eventOpt = window.pollEvent()) {
-            // Dereference the optional to get the event
-            if (std::holds_alternative<sf::Event::Closed>(*eventOpt)) {
+            // Use is() method to check event type in SFML 3
+            if (eventOpt->is<sf::Event::Closed>()) {
                 window.close();
             }
         }
