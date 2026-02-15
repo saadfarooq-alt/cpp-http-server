@@ -3,6 +3,8 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <queue>
+#include <mutex>
 #include <atomic>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -10,33 +12,22 @@
 constexpr int PORT = 8080;
 std::atomic<bool> running{true};
 
-void handleClient(int clientSocket) {
-    sf::RenderWindow window(sf::VideoMode({400u, 200u}), "New Client Window");
-    
-    sf::Font font;
-    if (!font.openFromFile("/System/Library/Fonts/SFNSDisplay.ttf")) {
-        std::cerr << "Font failed to load\n";
-        close(clientSocket);
-        return;
-    }
-    
-    sf::Text text(font, "Hello! Client connected!", 20);
-    text.setPosition({20.f, 80.f});
-    
-    while (window.isOpen() && running) {
-        while (auto eventOpt = window.pollEvent()) {
-            // Use is() method to check event type in SFML 3
-            if (eventOpt->is<sf::Event::Closed>()) {
-                window.close();
-            }
+// Thread-safe queue for new client connections
+std::queue<int> clientQueue;
+std::mutex queueMutex;
+
+// Store all windows
+std::vector<std::unique_ptr<sf::RenderWindow>> windows;
+
+void acceptClients(int serverSocket) {
+    while (running) {
+        int clientSocket = accept(serverSocket, nullptr, nullptr);
+        if (clientSocket >= 0) {
+            std::lock_guard<std::mutex> lock(queueMutex);
+            clientQueue.push(clientSocket);
+            std::cout << "New client connected: " << clientSocket << std::endl;
         }
-        
-        window.clear(sf::Color::Black);
-        window.draw(text);
-        window.display();
     }
-    
-    close(clientSocket);
 }
 
 int main() {
@@ -53,29 +44,86 @@ int main() {
     
     if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
         std::cerr << "Bind failed\n";
+        close(serverSocket);
         return 1;
     }
     
     if (listen(serverSocket, 5) < 0) {
         std::cerr << "Listen failed\n";
+        close(serverSocket);
         return 1;
     }
     
     std::cout << "Server listening on port " << PORT << "...\n";
+    std::cout << "Connect using: nc localhost " << PORT << std::endl;
     
-    std::vector<std::thread> clients;
+    // Start accept thread
+    std::thread acceptThread(acceptClients, serverSocket);
+    
+    sf::Font font;
+    if (!font.openFromFile("/System/Library/Fonts/Helvetica.ttc")) {
+        std::cerr << "Font failed to load\n";
+        running = false;
+    }
+    
+    // Main loop - handle windows on main thread
     while (running) {
-        int clientSocket = accept(serverSocket, nullptr, nullptr);
-        if (clientSocket >= 0) {
-            clients.emplace_back(handleClient, clientSocket);
+        // Check for new clients
+        {
+            std::lock_guard<std::mutex> lock(queueMutex);
+            while (!clientQueue.empty()) {
+                int clientSocket = clientQueue.front();
+                clientQueue.pop();
+                
+                // Create window on main thread
+                auto window = std::make_unique<sf::RenderWindow>(
+                    sf::VideoMode({400u, 200u}), 
+                    "Client " + std::to_string(clientSocket)
+                );
+                
+                windows.push_back(std::move(window));
+            }
+        }
+        
+        // Process all windows
+        for (auto it = windows.begin(); it != windows.end();) {
+            auto& window = *it;
+            
+            // Handle events
+            while (auto eventOpt = window->pollEvent()) {
+                if (eventOpt->is<sf::Event::Closed>()) {
+                    window->close();
+                }
+            }
+            
+            // Draw
+            if (window->isOpen()) {
+                window->clear(sf::Color::Black);
+                
+                sf::Text text(font, "Hello! Client connected!", 20);
+                text.setPosition({20.f, 80.f});
+                text.setFillColor(sf::Color::White);
+                
+                window->draw(text);
+                window->display();
+                ++it;
+            } else {
+                it = windows.erase(it);
+            }
+        }
+        
+        // Exit if no windows and user presses Ctrl+C
+        if (windows.empty()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
     
-    for (auto& t : clients) {
-        if (t.joinable())
-            t.join();
+    running = false;
+    close(serverSocket);
+    
+    if (acceptThread.joinable()) {
+        acceptThread.join();
     }
     
-    close(serverSocket);
     return 0;
 }
