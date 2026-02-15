@@ -69,7 +69,7 @@ std::string buildHTTPResponse(const std::string& body, const std::string& conten
 
 // HTML dashboard
 std::string getDashboardHTML() {
-    return R"(<!DOCTYPE html>
+    return R"HTML(<!DOCTYPE html>
 <html>
 <head>
     <title>Dress-Up Dashboard</title>
@@ -313,7 +313,7 @@ std::string getDashboardHTML() {
         updateOutfit();
     </script>
 </body>
-</html>)";
+</html>)HTML";
 }
 
 // Parse HTTP request
@@ -456,56 +456,56 @@ int main() {
     
     // Body model
     sf::RectangleShape head({80.f, 80.f});
-    head.setPosition(260.f, 150.f);
+    head.setPosition({260.f, 150.f});
     head.setFillColor(sf::Color(255, 220, 177));
     head.setOutlineThickness(3.f);
     head.setOutlineColor(sf::Color::Black);
     
     sf::RectangleShape torso({100.f, 120.f});
-    torso.setPosition(250.f, 230.f);
+    torso.setPosition({250.f, 230.f});
     torso.setFillColor(sf::Color(255, 220, 177));
     torso.setOutlineThickness(3.f);
     torso.setOutlineColor(sf::Color::Black);
     
     sf::RectangleShape legs({100.f, 150.f});
-    legs.setPosition(250.f, 350.f);
+    legs.setPosition({250.f, 350.f});
     legs.setFillColor(sf::Color(255, 220, 177));
     legs.setOutlineThickness(3.f);
     legs.setOutlineColor(sf::Color::Black);
     
     // Clothing shapes
     sf::RectangleShape hatShape({80.f, 50.f});
-    hatShape.setPosition(260.f, 110.f);
+    hatShape.setPosition({260.f, 110.f});
     hatShape.setOutlineThickness(2.f);
     hatShape.setOutlineColor(sf::Color::Black);
     
     sf::RectangleShape shirtShape({100.f, 120.f});
-    shirtShape.setPosition(250.f, 230.f);
+    shirtShape.setPosition({250.f, 230.f});
     shirtShape.setOutlineThickness(2.f);
     shirtShape.setOutlineColor(sf::Color::Black);
     
     sf::RectangleShape pantsShape({100.f, 150.f});
-    pantsShape.setPosition(250.f, 350.f);
+    pantsShape.setPosition({250.f, 350.f});
     pantsShape.setOutlineThickness(2.f);
     pantsShape.setOutlineColor(sf::Color::Black);
     
     sf::RectangleShape shoesShape({90.f, 50.f});
-    shoesShape.setPosition(255.f, 500.f);
+    shoesShape.setPosition({255.f, 500.f});
     shoesShape.setOutlineThickness(2.f);
     shoesShape.setOutlineColor(sf::Color::Black);
     
     // Title
     sf::Text title(font, "Dress-Up Game - Server View", 28);
-    title.setPosition(80.f, 20.f);
+    title.setPosition({80.f, 20.f});
     title.setFillColor(sf::Color::White);
     
     sf::Text subtitle(font, "Control via http://localhost:8080", 18);
-    subtitle.setPosition(140.f, 60.f);
+    subtitle.setPosition({140.f, 60.f});
     subtitle.setFillColor(sf::Color(200, 200, 200));
     
     // Status text
     sf::Text statusText(font, "", 16);
-    statusText.setPosition(50.f, 600.f);
+    statusText.setPosition({50.f, 600.f});
     statusText.setFillColor(sf::Color::White);
     
     while (window.isOpen()) {
