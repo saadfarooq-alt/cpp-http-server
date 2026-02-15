@@ -11,11 +11,7 @@ constexpr int PORT = 8080;
 std::atomic<bool> running{true};
 
 void handleClient(int clientSocket) {
-    // Create VideoMode explicitly
-    sf::VideoMode mode{};
-    mode.width = 400;
-    mode.height = 200;
-
+    sf::VideoMode mode({400u, 200u}); // Construct with Vector2u
     sf::RenderWindow window(mode, "New Client Window");
 
     sf::Font font;
@@ -25,7 +21,6 @@ void handleClient(int clientSocket) {
         return;
     }
 
-    // Construct sf::Text with font
     sf::Text text(font, "Hello! Client connected!", 20);
     text.setPosition({20.f, 80.f});
 
@@ -33,7 +28,9 @@ void handleClient(int clientSocket) {
         // Poll events
         while (auto eventOpt = window.pollEvent()) {
             const sf::Event& event = *eventOpt;
-            if (event.kind == sf::Event::Closed) {
+
+            // SFML 3: event.type -> check Closed variant
+            if (std::holds_alternative<sf::Event::Closed>(event)) {
                 window.close();
             }
         }
