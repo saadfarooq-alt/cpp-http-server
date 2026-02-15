@@ -9,13 +9,11 @@
 
 void handleClient(int client_fd, int client_num) {
     // SFML 3 requires Vector2u for VideoMode
-    sf::RenderWindow window({400, 200}, "Client Window"); // {width, height}
+    sf::RenderWindow window({400u, 200u}, "New Window");
 
     sf::Font font;
     if (!font.openFromFile("/System/Library/Fonts/SFNSDisplay.ttf")) {
-        std::cerr << "Failed to load font\n";
-        close(client_fd);
-        return;
+        std::cerr << "Font failed to load\n";
     }
 
     sf::Text text;
