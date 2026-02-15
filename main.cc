@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 #include <atomic>
+#include <variant>
 #include <netinet/in.h>
 #include <unistd.h>
 
@@ -27,10 +28,8 @@ void handleClient(int clientSocket) {
     while (window.isOpen() && running) {
         // SFML 3: pollEvent() returns std::optional<sf::Event>
         while (auto eventOpt = window.pollEvent()) {
-            const sf::Event& event = *eventOpt;
-            
-            // SFML 3: Use std::holds_alternative to check event type
-            if (std::holds_alternative<sf::Event::Closed>(event)) {
+            // Dereference the optional to get the event
+            if (std::holds_alternative<sf::Event::Closed>(*eventOpt)) {
                 window.close();
             }
         }
