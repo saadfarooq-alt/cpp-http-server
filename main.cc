@@ -8,8 +8,8 @@
 #include <unistd.h>
 
 void handleClient(int client_fd, int client_num) {
-    // Open SFML 3 window
-    sf::RenderWindow window(sf::Vector2u(400, 200), "Client Window");
+    // SFML 3 requires Vector2u for VideoMode
+    sf::RenderWindow window({400, 200}, "Client Window"); // {width, height}
 
     sf::Font font;
     if (!font.openFromFile("/System/Library/Fonts/SFNSDisplay.ttf")) {
@@ -22,9 +22,10 @@ void handleClient(int client_fd, int client_num) {
     text.setFont(font);
     text.setString("Client " + std::to_string(client_num) + " connected!");
     text.setCharacterSize(20);
-    text.setPosition(sf::Vector2f(20.f, 80.f));
+    text.setPosition({20.f, 80.f}); // now takes sf::Vector2f
 
     while (window.isOpen()) {
+        // SFML 3 pollEvent now returns std::optional<Event>
         while (auto eventOpt = window.pollEvent()) {
             const sf::Event& event = *eventOpt;
             if (event.type == sf::Event::Closed) {
@@ -74,12 +75,10 @@ int main() {
         int client_fd = accept(server_fd, nullptr, nullptr);
         if (client_fd >= 0) {
             client_num++;
-            // Handle each client in a separate thread
             threads.emplace_back(handleClient, client_fd, client_num);
         }
     }
 
-    // Join threads before exiting (never reached here in this simple example)
     for (auto& t : threads) t.join();
     close(server_fd);
 }
