@@ -11,25 +11,29 @@ constexpr int PORT = 8080;
 std::atomic<bool> running{true};
 
 void handleClient(int clientSocket) {
-    // Create a new SFML window for this client
-    sf::RenderWindow window({400u, 200u}, "New Client Window");
+    // Create VideoMode explicitly
+    sf::VideoMode mode{};
+    mode.width = 400;
+    mode.height = 200;
+
+    sf::RenderWindow window(mode, "New Client Window");
+
     sf::Font font;
     if (!font.openFromFile("/System/Library/Fonts/SFNSDisplay.ttf")) {
         std::cerr << "Font failed to load\n";
+        close(clientSocket);
         return;
     }
 
-    sf::Text text;
-    text.setFont(font);
-    text.setString("Hello! Client connected!");
-    text.setCharacterSize(20);
+    // Construct sf::Text with font
+    sf::Text text(font, "Hello! Client connected!", 20);
     text.setPosition({20.f, 80.f});
 
     while (window.isOpen() && running) {
         // Poll events
         while (auto eventOpt = window.pollEvent()) {
             const sf::Event& event = *eventOpt;
-            if (event.type == sf::Event::Closed) {
+            if (event.kind == sf::Event::Closed) {
                 window.close();
             }
         }
@@ -71,7 +75,6 @@ int main() {
     while (running) {
         int clientSocket = accept(serverSocket, nullptr, nullptr);
         if (clientSocket >= 0) {
-            // Launch a thread for each client
             clients.emplace_back(handleClient, clientSocket);
         }
     }
