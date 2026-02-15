@@ -3,27 +3,30 @@
 #include <iostream>
 #include <thread>
 #include <vector>
-#include <sys/socket.h>
+#include <atomic>
 #include <netinet/in.h>
 #include <unistd.h>
 
-void handleClient(int client_fd, int client_num) {
-    // SFML 3 requires Vector2u for VideoMode
-    sf::RenderWindow window({400u, 200u}, "New Window");
+constexpr int PORT = 8080;
+std::atomic<bool> running{true};
 
+void handleClient(int clientSocket) {
+    // Create a new SFML window for this client
+    sf::RenderWindow window({400u, 200u}, "New Client Window");
     sf::Font font;
     if (!font.openFromFile("/System/Library/Fonts/SFNSDisplay.ttf")) {
         std::cerr << "Font failed to load\n";
+        return;
     }
 
     sf::Text text;
     text.setFont(font);
-    text.setString("Client " + std::to_string(client_num) + " connected!");
+    text.setString("Hello! Client connected!");
     text.setCharacterSize(20);
-    text.setPosition({20.f, 80.f}); // now takes sf::Vector2f
+    text.setPosition({20.f, 80.f});
 
-    while (window.isOpen()) {
-        // SFML 3 pollEvent now returns std::optional<Event>
+    while (window.isOpen() && running) {
+        // Poll events
         while (auto eventOpt = window.pollEvent()) {
             const sf::Event& event = *eventOpt;
             if (event.type == sf::Event::Closed) {
@@ -36,47 +39,48 @@ void handleClient(int client_fd, int client_num) {
         window.display();
     }
 
-    close(client_fd);
+    close(clientSocket);
 }
 
 int main() {
-    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd < 0) {
+    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocket == -1) {
         std::cerr << "Failed to create socket\n";
         return 1;
     }
 
-    sockaddr_in address{};
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(8080);
+    sockaddr_in serverAddr{};
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+    serverAddr.sin_port = htons(PORT);
 
-    int opt = 1;
-    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-
-    if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
+    if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
         std::cerr << "Bind failed\n";
         return 1;
     }
 
-    if (listen(server_fd, 5) < 0) {
+    if (listen(serverSocket, 5) < 0) {
         std::cerr << "Listen failed\n";
         return 1;
     }
 
-    std::cout << "Server listening on port 8080...\n";
+    std::cout << "Server listening on port " << PORT << "...\n";
 
-    int client_num = 0;
-    std::vector<std::thread> threads;
+    std::vector<std::thread> clients;
 
-    while (true) {
-        int client_fd = accept(server_fd, nullptr, nullptr);
-        if (client_fd >= 0) {
-            client_num++;
-            threads.emplace_back(handleClient, client_fd, client_num);
+    while (running) {
+        int clientSocket = accept(serverSocket, nullptr, nullptr);
+        if (clientSocket >= 0) {
+            // Launch a thread for each client
+            clients.emplace_back(handleClient, clientSocket);
         }
     }
 
-    for (auto& t : threads) t.join();
-    close(server_fd);
+    for (auto& t : clients) {
+        if (t.joinable())
+            t.join();
+    }
+
+    close(serverSocket);
+    return 0;
 }
