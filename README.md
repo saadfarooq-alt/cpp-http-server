@@ -256,10 +256,6 @@ Contributions are welcome! Here are some ideas:
 - [ ] Mobile-responsive design improvements
 - [ ] Add sound effects when clothing changes
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Acknowledgments
 
 - **SFML Team** - For the excellent multimedia library
@@ -274,5 +270,3 @@ Created by Saad Farooq - feel free to reach out!
 - Email: s4farooq@uwaterloo.ca
 
 ---
-
-Star this repo if you found it helpful!
