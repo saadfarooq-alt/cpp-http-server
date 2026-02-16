@@ -25,12 +25,12 @@ The server window displays the mannequin with clothing items rendered in real-ti
 Access `http://localhost:8080` in any browser to control the outfit with a click.
 
 ```
-┌─────────────────┐         ┌──────────────────┐
-│  Web Browser    │────────▶│   HTTP Server    │
-│  localhost:8080 │         │   (Port 8080)    │
-└─────────────────┘         └────────┬─────────┘
-                                     │
-                                     ▼
+┌─────────────────┐          ┌──────────────────┐
+│  Web Browser    │ ──────▶ │   HTTP Server     │
+│  localhost:8080 │          │   (Port 8080)    │
+└─────────────────┘          └────────┬─────────┘
+                                      │
+                                      ▼
                             ┌────────────────────┐
                             │  Shared State      │
                             │  (Thread-safe)     │
