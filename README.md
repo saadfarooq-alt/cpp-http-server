@@ -5,7 +5,6 @@ A real-time, networked dress-up game built with C++ and SFML, featuring a deskto
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![C++](https://img.shields.io/badge/C++-17-00599C?logo=c%2B%2B)
 ![SFML](https://img.shields.io/badge/SFML-3.0.2-green)
-![License](https://img.shields.io/badge/license-MIT-orange)
 
 ## Features
 
