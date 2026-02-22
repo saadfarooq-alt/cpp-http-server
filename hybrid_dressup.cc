@@ -210,39 +210,39 @@ std::string getDashboardHTML() {
 </head>
 <body>
     <div class="container">
-        <h1>👔 Dress-Up Dashboard</h1>
+        <h1>Dress-Up Dashboard</h1>
         <p class="subtitle">Control the outfit in real-time • Changes appear instantly on the desktop app</p>
         
         <div class="current-outfit">
             <h2>Current Outfit</h2>
             <div class="outfit-item">
-                <strong>🎩 Hat:</strong>
+                <strong>Hat:</strong>
                 <span id="current-hat">none</span>
             </div>
             <div class="outfit-item">
-                <strong>👕 Shirt:</strong>
+                <strong>Shirt:</strong>
                 <span id="current-shirt">none</span>
             </div>
             <div class="outfit-item">
-                <strong>👖 Pants:</strong>
+                <strong>Pants:</strong>
                 <span id="current-pants">none</span>
             </div>
             <div class="outfit-item">
-                <strong>👟 Shoes:</strong>
+                <strong>Shoes:</strong>
                 <span id="current-shoes">none</span>
             </div>
         </div>
 
         <div class="wardrobe">
             <div class="category">
-                <h3>🎩 Hats</h3>
+                <h3>Hats</h3>
                 <button class="item-btn red" onclick="wear('hat', 'red_hat')">Red Hat</button>
                 <button class="item-btn blue" onclick="wear('hat', 'blue_hat')">Blue Hat</button>
                 <button class="item-btn" onclick="wear('hat', 'none')">Remove Hat</button>
             </div>
 
             <div class="category">
-                <h3>👕 Shirts</h3>
+                <h3>Shirts</h3>
                 <button class="item-btn red" onclick="wear('shirt', 'red_shirt')">Red Shirt</button>
                 <button class="item-btn green" onclick="wear('shirt', 'green_shirt')">Green Shirt</button>
                 <button class="item-btn blue" onclick="wear('shirt', 'blue_shirt')">Blue Shirt</button>
@@ -250,7 +250,7 @@ std::string getDashboardHTML() {
             </div>
 
             <div class="category">
-                <h3>👖 Pants</h3>
+                <h3>Pants</h3>
                 <button class="item-btn black" onclick="wear('pants', 'black_pants')">Black Pants</button>
                 <button class="item-btn denim" onclick="wear('pants', 'blue_jeans')">Blue Jeans</button>
                 <button class="item-btn khaki" onclick="wear('pants', 'khaki_pants')">Khaki Pants</button>
@@ -258,14 +258,14 @@ std::string getDashboardHTML() {
             </div>
 
             <div class="category">
-                <h3>👟 Shoes</h3>
+                <h3>Shoes</h3>
                 <button class="item-btn white" onclick="wear('shoes', 'sneakers')">White Sneakers</button>
                 <button class="item-btn black" onclick="wear('shoes', 'boots')">Black Boots</button>
                 <button class="item-btn" onclick="wear('shoes', 'none')">Remove Shoes</button>
             </div>
         </div>
 
-        <button class="reset-btn" onclick="resetOutfit()">🔄 Reset All</button>
+        <button class="reset-btn" onclick="resetOutfit()">Reset All</button>
         <div id="status" class="status"></div>
     </div>
 
